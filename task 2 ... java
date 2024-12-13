@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <title>ATEC</title>
+    <style>
+      div {
+        margin-bottom: 30px;
+      }
+      #result {
+        padding: 30px;
+        font-size: 22px;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <div>
+        <label for="Height">Height:</label>
+        <input
+          type="number"
+          id="height"
+          placeholder="Enter your height in CM"
+        />
+      </div>
+      <div>
+        <label for="Age">Age:</label>
+        <input type="number" id="age" placeholder="Enter your age" />
+      </div>
+
+      <div>
+        <label for="gender">Gender:</label>
+        <select id="gender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="CurrentWeight">Current Weight:</label>
+        <input
+          type="number"
+          id="currentWeight"
+          placeholder="Enter your current weight in KG"
+        />
+      </div>
+
+      <div>
+        <label for="TargetWeight">Target Weight:</label>
+        <input
+          type="number"
+          id="targetWeight"
+          placeholder="Enter your target weight in KG"
+        />
+      </div>
+
+      <div>
+        <button type="button" id="submit" onclick="send()">Submit</button>
+      </div>
+
+      <div id="result"></div>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      function send() {
+        const height = document.getElementById("height").value;
+        const age = document.getElementById("age").value;
+        const gender = document.getElementById("gender").value;
+        const currentWeight = document.getElementById("currentWeight").value;
+        const targetWeight = document.getElementById("targetWeight").value;
+
+        
+        if (!height || !age || !gender || !currentWeight || !targetWeight) {
+          document.getElementById("result").innerText =
+            "Please fill out all the fields.";
+          return;
+        }
+
+        let prompt = `You are a doctor. Create a diet plan for losing weight using the below data:
+
+Height: ${height} CM
+Age: ${age} Years Old
+Gender: ${gender}
+Current Weight: ${currentWeight} KG
+Target Weight: ${targetWeight} KG`;
+        axios
+          .post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              model: "llama-3.2-3b-preview",
+              messages: [
+                {
+                  role: "user",
+                  content: prompt,
+                },
+              ],
+              temperature: 1,
+              max_tokens: 1024,
+              top_p: 1,
+              stop: null,
+            },
+            {
+              headers: {
+                Authorization:
+                  "Bearer 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",
+              },
+            }
+          )
+          .then((response) => {
+            document.getElementById("result").innerText =
+              response.data.choices[0].message.content;
+          })
+          .catch((error) => {
+            console.error(error);
+            document.getElementById("result").innerText =
+              "An error occurred. Please try again.";
+          });
+      }
+    </script>
+  </body>
+</html>
